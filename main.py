@@ -4,25 +4,40 @@ class NotesList:
 
     def __init__(self):
         self.notes = []
+        self.load_notes()
 
-    def
+    def load_notes(self):
+        try:
+            with open('notes.json', encoding='utf-8') as r:
+                self.notes = json.load(r)
+        except FileNotFoundError:
+            self.notes = []
+
+    def write_notes(self):
+        with open('notes.json', 'w', encoding='utf-8') as w:
+            json.dump(self.notes, w)
 
     def show_notes(self):
         for index, note in enumerate(self.notes, start=1):
-            print(f'{index}: {note}')
+            print(f'{index}: {note["note"]}')
 
     def add_note(self, new_note):
-        self.notes.append(new_note)
+        self.notes.append({"note" : new_note})
+        self.write_notes()
 
     def delete_note(self, note_index):
         try:
             self.notes.pop(note_index - 1)
+            self.write_notes()
+
         except IndexError:
             print('Index out of range!')
 
     def change_note(self, note_index, new_note):
         try:
-            self.notes[note_index - 1] = new_note
+            self.notes[note_index - 1]["note"] = new_note
+            self.write_notes()
+
         except IndexError:
             print('Index out of range!')
             return False
@@ -43,7 +58,10 @@ while True:
         continue
 
     if script_selection == 1:
-        note_list.show_notes()
+        if not note_list.notes:
+            print('Нет заметок')
+        else:
+            note_list.show_notes()
 
     elif script_selection == 2:
         get_note = input('Введите заметку: ')
